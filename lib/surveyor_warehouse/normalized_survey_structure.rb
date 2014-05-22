@@ -22,24 +22,24 @@ module SurveyorWarehouse
             raise "Muliple answer types are unsupported: #{response_classes}" if response_classes.size > 1
             case response_classes[0]
             when 'string'
-              String
+              'string'
             when 'text'
-              String
+              'text'
             when 'date'
-              Date
+              'date'
             when 'datetime'
-              DateTime
+              'datetime'
             when 'float'
-              Float
+              'float'
             when 'decimal'
-              BigDecimal
+              'decimal'
             else
               raise "Unable to find type for question: #{question.inspect}"
             end
           when 'one'
-            Integer
+            'text'
           when 'any'
-            "integer[]"
+            "text[]"
           else
             raise "Unable to find type for question: #{question.inspect}"
           end
@@ -57,8 +57,8 @@ module SurveyorWarehouse
 
       # Add primary key and response set access code columns
       tables.each do |name, tdef|
-        tdef.columns << ColumnDefinition.new('access_code', String)
-        tdef.columns << ColumnDefinition.new('id', String)
+        tdef.columns << ColumnDefinition.new('access_code', 'string')
+        tdef.columns << ColumnDefinition.new('id', 'string')
       end
 
       @tables ||= tables.values
@@ -86,14 +86,19 @@ module SurveyorWarehouse
       end
 
       def create
-        mDB = SurveyorWarehouse::DB.connection
+        # mDB = SurveyorWarehouse::DB.connection
 
-        ctx = binding
-        mDB.create_table(name.to_sym) do
-          # Cannot use colummns directly because it is overwritten inside
-          # this block by #create_table
-          eval("columns", ctx).each do |c|
-            column c.name, c.type
+        # ctx = binding
+        # mDB.create_table(name.to_sym) do
+        #   # Cannot use colummns directly because it is overwritten inside
+        #   # this block by #create_table
+        #   eval("columns", ctx).each do |c|
+        #     column c.name, c.type
+        #   end
+        # end
+        ActiveRecord::Base.connection.create_table(name.to_sym) do |t|
+          columns.each do |c|
+            t.column c.name, c.type
           end
         end
       end

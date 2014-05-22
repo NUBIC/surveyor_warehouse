@@ -11,7 +11,7 @@ module SurveyorWarehouse
     end
 
     def self.configurations
-      @configurations ||= ActiveRecord::Base.configurations[Rails.env]
+      @configurations ||= ::ActiveRecord::Base.configurations[Rails.env]
     end
 
     def self.username

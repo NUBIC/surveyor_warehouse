@@ -1,6 +1,7 @@
 require 'surveyor'
 require 'surveyor_warehouse/normalized_survey_structure'
 require 'surveyor_warehouse/response_bin'
+require 'surveyor_warehouse/response_row'
 
 module SurveyorWarehouse
   module SurveyorExtensions

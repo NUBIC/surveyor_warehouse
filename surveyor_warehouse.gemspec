@@ -5,8 +5,17 @@ Gem::Specification.new do |s|
   s.description = "Transform surveyor responses into an alternate structure"
   s.authors     = ["John Dzak"]
   s.email       = 'j-dzak@northwestern.edu'
-  s.files       = `git ls-files`
-  s.homepage    =
-    'http://rubygems.org/gems/hola'
-  s.license       = 'MIT'
+  s.files       = Dir.glob("{README.md,{assets,lib,spec}/**/*}")
+  s.homepage    = 'http://rubygems.org/gems/surveyor_warehouse'
+  s.license     = 'MIT'
+
+  s.add_runtime_dependency 'surveyor'
+  s.add_runtime_dependency 'haml'
+  s.add_runtime_dependency 'rails'
+  s.add_runtime_dependency 'activesupport'
+  s.add_runtime_dependency 'actionpack'
+  s.add_runtime_dependency 'activerecord'
+
+  s.add_runtime_dependency 'sequel'
+  s.add_runtime_dependency 'pg'
 end

@@ -26,7 +26,7 @@ module SurveyorWarehouse
           when 'text'; 'text_value'
           end
 
-        value =  value_field.present? ? r.send(value_field) : r.answer.try(:reference_identifier).to_i
+        value =  value_field.present? ? r.send(value_field) : r.answer.try(:reference_identifier)
         [column.to_sym, value]
       end
 
