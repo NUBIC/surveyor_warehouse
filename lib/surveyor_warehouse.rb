@@ -2,6 +2,7 @@ require 'surveyor'
 require 'surveyor_warehouse/normalized_survey_structure'
 require 'surveyor_warehouse/response_bin'
 require 'surveyor_warehouse/response_row'
+require 'surveyor_warehouse/railtie' if defined?(Rails)
 
 module SurveyorWarehouse
   module SurveyorExtensions

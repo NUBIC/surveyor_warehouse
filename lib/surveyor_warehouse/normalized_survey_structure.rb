@@ -10,45 +10,18 @@ module SurveyorWarehouse
     # response_classes
     def tables
       questions = @survey.sections_with_questions.map(&:questions).flatten
-      definitions = questions.select {|q| q.data_export_identifier.present? && q.data_export_identifier.split('.').size == 2 }.map do |question| 
+      predefs = questions.map { |q| q.extend(SurveyorWarehouse::SurveyorExtensions::Question)}.select {|q| q.valid_data_export_identifier? }.map do |question| 
         dei_tokens = question.data_export_identifier.split('.')
 
         table = dei_tokens[0]
         column = dei_tokens[1]
-        type = 
-          case question.pick
-          when 'none'
-            response_classes = question.answers.map(&:response_class).uniq
-            raise "Muliple answer types are unsupported: #{response_classes}" if response_classes.size > 1
-            case response_classes[0]
-            when 'string'
-              'string'
-            when 'text'
-              'text'
-            when 'date'
-              'date'
-            when 'datetime'
-              'datetime'
-            when 'float'
-              'float'
-            when 'decimal'
-              'decimal'
-            else
-              raise "Unable to find type for question: #{question.inspect}"
-            end
-          when 'one'
-            'text'
-          when 'any'
-            "text[]"
-          else
-            raise "Unable to find type for question: #{question.inspect}"
-          end
-
+        type = database_type(question)
+          
         [table, column, type]
       end
 
       tables = {}
-      definitions.each do |d|
+      predefs.each do |d|
         table_name, column_name, column_type = d
         table = tables[table_name] || TableDefinition.new(table_name)
         table.columns << ColumnDefinition.new(column_name, column_type)
@@ -57,8 +30,8 @@ module SurveyorWarehouse
 
       # Add primary key and response set access code columns
       tables.each do |name, tdef|
-        tdef.columns << ColumnDefinition.new('access_code', 'string')
-        tdef.columns << ColumnDefinition.new('id', 'string')
+        tdef.columns << ColumnDefinition.new('access_code', 'text')
+        tdef.columns << ColumnDefinition.new('id', 'text')
       end
 
       @tables ||= tables.values
@@ -68,16 +41,42 @@ module SurveyorWarehouse
       tables.create!
     end
 
+    ##
+    # Force creates the structure by destroying all the tables first
+    #
     def create!
       destroy!
       tables.each(&:create)
     end
 
+    ##
+    # Destroy all the tables defined in the survey data_export_identifiers
+    #
     def destroy!
       drop_ddl = tables.map(&:name).map do |t|
         "drop table if exists #{t};\n"
       end.join
       ActiveRecord::Base.connection.execute(drop_ddl)
+    end
+
+    private
+    SUPPORTED_TYPES = %w(date datetime decimal float string text)
+    def database_type(question)
+      case question.pick
+      when 'none'
+        response_classes = question.answers.map(&:response_class).uniq
+        raise "Muliple answer types are unsupported: #{response_classes.join(', ')}" if response_classes.size > 1
+        type = response_classes[0].tap do |t|
+          raise "Unsupported column type '#{t}' for question: #{question.inspect}}" unless SUPPORTED_TYPES.include?(t)
+        end
+        type == 'string' ? 'text' : type
+      when 'one'
+        'text'
+      when 'any'
+        "text[]"
+      else
+        raise "Unable to find type for question: #{question.inspect}"
+      end
     end
 
     class TableDefinition < Struct.new(:name)
@@ -86,17 +85,7 @@ module SurveyorWarehouse
       end
 
       def create
-        # mDB = SurveyorWarehouse::DB.connection
-
-        # ctx = binding
-        # mDB.create_table(name.to_sym) do
-        #   # Cannot use colummns directly because it is overwritten inside
-        #   # this block by #create_table
-        #   eval("columns", ctx).each do |c|
-        #     column c.name, c.type
-        #   end
-        # end
-        ActiveRecord::Base.connection.create_table(name.to_sym) do |t|
+        ActiveRecord::Base.connection.create_table(name.to_sym, :id => false) do |t|
           columns.each do |c|
             t.column c.name, c.type
           end
