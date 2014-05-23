@@ -4,7 +4,7 @@ module SurveyorWarehouse
   class ResponseBin < Struct.new(:key, :access_code, :response_group)
     def <<(response)
       q = response.question
-      q.extend(SurveyorWarehouse::SurveyorExtensions::Question)
+      Question.send(:include, SurveyorWarehouse::Extensions::Question)
       if q.valid_data_export_identifier?
         (@responses ||= []) << response
       else

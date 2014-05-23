@@ -10,7 +10,8 @@ module SurveyorWarehouse
     # response_classes
     def tables
       questions = @survey.sections_with_questions.map(&:questions).flatten
-      predefs = questions.map { |q| q.extend(SurveyorWarehouse::SurveyorExtensions::Question)}.select {|q| q.valid_data_export_identifier? }.map do |question| 
+      Question.send(:include, SurveyorWarehouse::Extensions::Question)
+      predefs = questions.select {|q| q.valid_data_export_identifier? }.map do |question| 
         dei_tokens = question.data_export_identifier.split('.')
 
         table = dei_tokens[0]

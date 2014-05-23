@@ -1,29 +1,12 @@
 require 'surveyor'
+require 'active_support/concern'
+
 require 'surveyor_warehouse/normalized_survey_structure'
 require 'surveyor_warehouse/response_bin'
 require 'surveyor_warehouse/response_row'
 require 'surveyor_warehouse/railtie' if defined?(Rails)
-
-module SurveyorWarehouse
-  module SurveyorExtensions
-    module Survey
-      def current_versions
-        group = ::Survey.order("created_at DESC, survey_version DESC").all.group_by(&:access_code)
-        group.map { |access_code, surveys|  surveys.first }
-      end
-    end
-    module Question
-      ##
-      # A question's data_export_identifier should follow the
-      # format 'table.column' (e.g. 'patients.name')
-      def valid_data_export_identifier?
-        dei = self.try(:data_export_identifier)
-        dei.present? && dei.split('.').size == 2
-      end
-    end
-  end
-end
-
+require 'surveyor_warehouse/extensions/question'
+require 'surveyor_warehouse/extensions/survey'
 
 module SurveyorWarehouse
   def self.logger
@@ -31,7 +14,7 @@ module SurveyorWarehouse
   end
 
   def self.transform
-    Survey.extend(SurveyorWarehouse::SurveyorExtensions::Survey)
+    Survey.include(SurveyorWarehouse::Extensions::Survey)
 
     surveys = Survey.current_versions
 
@@ -48,7 +31,7 @@ module SurveyorWarehouse
   end
 
   def self.clobber
-    Survey.extend(SurveyorWarehouse::SurveyorExtensions::Survey)
+    Survey.extend(SurveyorWarehouse::Extensions::Survey)
 
     surveys = Survey.current_versions
 
@@ -59,3 +42,6 @@ module SurveyorWarehouse
 
   end
 end
+
+# Survey.send(:include, SurveyorWarehouse::Extensions::Survey)
+# Question.send(:include, SurveyorWarehouse::Extensions::Question)
