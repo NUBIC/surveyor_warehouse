@@ -68,3 +68,5 @@ Responses would be transformed into:
 ## Limitations
 
 * Currently only works with PostgresSQL
+* Only response sets for the most recent survey version are transformed
+* Responses are transformed into the same database as surveyor
