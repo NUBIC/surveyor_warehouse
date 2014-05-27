@@ -14,7 +14,7 @@ module SurveyorWarehouse
   end
 
   def self.transform
-    Survey.include(SurveyorWarehouse::Extensions::Survey)
+    Survey.send(:include, SurveyorWarehouse::Extensions::Survey)
 
     surveys = Survey.current_versions
 
@@ -31,7 +31,7 @@ module SurveyorWarehouse
   end
 
   def self.clobber
-    Survey.extend(SurveyorWarehouse::Extensions::Survey)
+    Survey.send(:include, SurveyorWarehouse::Extensions::Survey)
 
     surveys = Survey.current_versions
 
