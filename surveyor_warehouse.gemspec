@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.authors     = ["John Dzak"]
   s.email       = 'j-dzak@northwestern.edu'
   s.files       = Dir.glob("{README.md,{assets,lib,spec}/**/*}")
-  s.homepage    = 'http://rubygems.org/gems/surveyor_warehouse'
+  s.homepage    = 'https://github.com/NUBIC/surveyor_warehouse'
   s.license     = 'MIT'
 
   s.add_runtime_dependency 'surveyor'
