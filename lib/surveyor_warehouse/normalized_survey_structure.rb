@@ -61,7 +61,7 @@ module SurveyorWarehouse
     end
 
     private
-    SUPPORTED_TYPES = %w(date datetime decimal float string text)
+    SUPPORTED_TYPES = %w(date datetime decimal float integer string text)
     def database_type(question)
       case question.pick
       when 'none'
