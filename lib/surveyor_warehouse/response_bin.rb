@@ -39,7 +39,7 @@ module SurveyorWarehouse
     #       [Response access_code:'xyz' response_group:0 string_value:'Kindle']]
     #   [ResponseBin key:'xyz:1' responses: [
     #       [Response access_code:'xyz' response_group:1 string_value:'EC2']]
-    DEFAULT_RESPONSE_GROUP = 1
+    DEFAULT_RESPONSE_GROUP = 0
     def self.bins(responses)
       bins = {}
       responses.each do |r|
