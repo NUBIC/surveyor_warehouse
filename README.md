@@ -41,7 +41,7 @@ Responses would be transformed into:
     name   | age | gender |     shoes     | access_code |      id
   ---------+-----+--------+---------------+-------------+--------------
    raphael |  18 | male   | {nike,adidas} | QUhwHtMPyQ  | QUhwHtMPyQ.0
-   Stephen |  50 | male   | {none}        | zZu1OV1hmw  | zZu1OV1hmw.0
+   stephen |  50 | male   | {none}        | zZu1OV1hmw  | zZu1OV1hmw.0
   (2 rows)
 
   db=# select * from siblings;
