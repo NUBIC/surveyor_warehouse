@@ -38,10 +38,6 @@ module SurveyorWarehouse
       @tables ||= tables.values
     end
 
-    def ddl
-      tables.create!
-    end
-
     ##
     # Force creates the structure by destroying all the tables first
     #
